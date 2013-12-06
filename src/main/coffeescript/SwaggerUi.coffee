@@ -26,6 +26,23 @@ class SwaggerUi extends Backbone.Router
     @options.progress = (d) => @showMessage(d)
     @options.failure = (d) => @onLoadFailure(d)
 
+    # monkey patch JSON.parse to deal with invalid JSON
+    _parse = JSON.parse
+    JSON.parse = (json) ->
+      try
+        result = _parse(json)
+      catch e
+        result = {
+          "swaggerVersion":"1.2",
+          "apis":[],
+          "info":{
+            "title":"Invalid API!",
+            "description":"The URL appears to be invalid."
+            }
+          }
+      result
+      
+
     # Create view to handle the header inputs
     @headerView = new HeaderView({el: $('#header')})
 
